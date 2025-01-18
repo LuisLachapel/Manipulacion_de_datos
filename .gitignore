@@ -1,0 +1,9 @@
+#Ignorar carpeta mac os
+Resources/__MACOSX
+
+#Ignorar archivos ipynb
+Resources/notebooks/*ipynb
+
+#Ignorar archivos mp4
+
+Resources/notebooks/*mp4
