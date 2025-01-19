@@ -15,7 +15,7 @@ paragraph = document.add_paragraph("")
 
 
 source = r'D:\Cursos\Python\Manipulacion y limpieza\Resources\notebooks\datos.csv'
-output_doc = "documento de practicas.docx"
+output_doc = r"Output/documento de practicas.docx"
 
 if os.path.exists(output_doc):
     os.remove(output_doc)
@@ -76,11 +76,11 @@ document.add_paragraph("Para leer un grupo de columnas en especifico se utiliza 
 df_excel = pd.read_excel(source_excel)
 document.add_paragraph("Para guardar un dataframe en un excel se convierte los datos en un dataframe y se utiliza la propiedad .to_excel, donde la propiendad index se deja en false si no se quiere agregar los numeros a las filas")
 
-if os.path.exists('documento excel.xlsx'):
-    os.remove('documento excel.xlsx')
+if os.path.exists('Output File/documento excel.xlsx'):
+    os.remove('Output file/documento excel.xlsx')
     
 
-df_excel.to_excel('documento excel.xlsx',index=True)
+df_excel.to_excel('Output/documento excel.xlsx',index=True)
 
 #Descripcion de datos
 
@@ -157,5 +157,5 @@ document.add_paragraph("Para obtener el salario promedio por edad utilizo groupb
 data_agrupada = data_faltante.groupby('Rango_Edad',observed= True)['Salario'].mean()
 document.add_paragraph(data_agrupada.to_string())
 
-document.save("documento de practicas.docx")
+document.save("Output/documento de practicas.docx")
 
