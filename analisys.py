@@ -1,10 +1,9 @@
 import csv
 import pandas as pd
 from docx import Document
-from docx.shared import Cm, Pt
 import os
 import openpyxl
-from sklearn.linear_model import LinearRegression 
+
 
 #documentation: https://python-docx.readthedocs.io/en/latest/
 
@@ -157,5 +156,5 @@ document.add_paragraph("Para obtener el salario promedio por edad utilizo groupb
 data_agrupada = data_faltante.groupby('Rango_Edad',observed= True)['Salario'].mean()
 document.add_paragraph(data_agrupada.to_string())
 
-document.save("Output/documento de practicas.docx")
+document.save(r"Output/documento de practicas.docx")
 
