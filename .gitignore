@@ -7,3 +7,5 @@ Resources/notebooks/*ipynb
 #Ignorar archivos mp4
 
 Resources/notebooks/*mp4
+
+__pycache__

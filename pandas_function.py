@@ -4,8 +4,6 @@ from docx import Document
 def pandas_manipulation(source,document):    
     document = Document()
     
-    
-
     document.add_heading(r"Abrir archivos con pandas", level=2)
     data = pd.read_csv(source)
     document.add_paragraph(data.to_string())
@@ -29,9 +27,6 @@ def pandas_manipulation(source,document):
     document.add_paragraph('Para tener una descripcion de los datos utlizar el metodo describe de pandas ')
     document.add_paragraph(data_txt.describe().to_string())
 
-    document.add_paragraph('Para tener un resumen de la tabla utilizar el metodo info:')
-
-    document.add_paragraph(data_txt.info())
     document.add_paragraph('Si quiero saber los tipos utilizo la propiedad dtypes: ')
     document.add_paragraph(data_txt.dtypes.to_string())
 
@@ -100,4 +95,35 @@ def pandas_manipulation(source,document):
     data_agrupada = data_faltante.groupby('Rango_Edad',observed= True)['Salario'].mean()
     document.add_paragraph(data_agrupada.to_string())
 
+    #Manejo de duplicados
+    
+    duplicate = pd.read_csv(r'Resources\notebooks\data_duplicada.csv')
+
+    document.add_heading("Manejo de duplicados", level=2)
+    document.add_paragraph("""Al usar el metodo .duplicated() me indica por medio de booleans que filas son duplicadas, sin necesidad de que estos sean consecutivos""")
+
+    document.add_paragraph(duplicate.duplicated().to_string())
+
+    document.add_paragraph("""Se puede usar el parametro subset para especificar las columnas y saber si contiene duplicados""")
+    
+    document.add_paragraph(duplicate.duplicated(subset='Nombre').to_string())
+
+    document.add_paragraph("""Obteniendo las filas de los duplicados con: duplicate[duplicate.duplicated()""")
+
+    duplicated_rows = duplicate[duplicate.duplicated()]
+    document.add_paragraph(duplicated_rows.to_string())
+
+    document.add_paragraph("""Para eliminar los duplicados se utiliza el metodo .drop_duplicates()""")
+    duplicate_delete = duplicate.drop_duplicates()
+    document.add_paragraph(duplicate_delete.to_string())
+
+
+
+
+   
+
+
     document.save(r"Output/documento de practicas.docx")
+
+
+

@@ -90,9 +90,6 @@ data_txt = pd.read_csv(r'Resources\notebooks\datos.txt', delimiter='|')
 document.add_paragraph('Para tener una descripcion de los datos utlizar el metodo describe de pandas ')
 document.add_paragraph(data_txt.describe().to_string())
 
-document.add_paragraph('Para tener un resumen de la tabla utilizar el metodo info:')
-
-document.add_paragraph(data_txt.info())
 document.add_paragraph('Si quiero saber los tipos utilizo la propiedad dtypes: ')
 document.add_paragraph(data_txt.dtypes.to_string())
 
@@ -155,6 +152,7 @@ document.add_paragraph(data_faltante.to_string())
 document.add_paragraph("Para obtener el salario promedio por edad utilizo groupby() ")
 data_agrupada = data_faltante.groupby('Rango_Edad',observed= True)['Salario'].mean()
 document.add_paragraph(data_agrupada.to_string())
+
 
 document.save(r"Output/documento de practicas.docx")
 
