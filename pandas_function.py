@@ -117,6 +117,22 @@ def pandas_manipulation(source,document):
     duplicate_delete = duplicate.drop_duplicates()
     document.add_paragraph(duplicate_delete.to_string())
 
+    document.add_paragraph("Para crear una columna que indique los valores duplicados se hace de este metodo: duplicate['Es duplicado?'] = duplicate.duplicated() ")
+    duplicate['Es duplicado?'] = duplicate.duplicated()
+    document.add_paragraph(duplicate.to_string())
+
+    document.add_paragraph("Usando .map puedo cambiar los valores de la columna 'Es duplicado' de un booleano a Si 0 No")
+    duplicate["Es duplicado?"] = duplicate["Es duplicado?"].map({True: 'Si', False: 'No'})
+    document.add_paragraph(duplicate.to_string())
+    """ duplicate_summarized = duplicate.groupby('Nombre').agg({
+        'Edad': 'first',
+        'Salario': 'mean',
+        'Fecha_Ingreso': 'first'
+    }).reset_index()"""
+    
+
+    
+
 
 
 
