@@ -129,11 +129,33 @@ def pandas_manipulation(source,document):
         'Salario': 'mean',
         'Fecha_Ingreso': 'first'
     }).reset_index()"""
+
+    #Manejo de columnas
+
+    document.add_paragraph("Para reordenar las columnas de un dataframe se hace de esta forma:duplicate[['ID','Nombre','Edad', 'Salario','Es duplicado?','Fecha_Ingreso']]")
+    document.add_paragraph(duplicate[['ID','Nombre','Edad', 'Salario','Es duplicado?','Fecha_Ingreso']].to_string())
     
+    document.add_paragraph("Para elegir columnas especificas de un dataframe se puede usa la propiedad .loc de esta manera: duplicate.loc[:,['ID','Nombre']] ")
+    duplicate_loc = duplicate.loc[:,["ID",'Nombre']]
+    document.add_paragraph(duplicate_loc.to_string())
+    document.add_paragraph("El primer parametro de la propiedad .loc se utiliza para especificar el rango de las filas que se selecionaran, ejemplo de filas del 1 al 9 / 1:9")
+    document.add_paragraph(duplicate_loc[1:9].to_string())
 
+    document.add_paragraph("Para eliminar una columna, ejemplo la duplicado, se utiliza el metodo ..drop(columns=['Es duplicado?'])")
+    duplicate = duplicate.drop(columns=['Es duplicado?'])
+    document.add_paragraph(duplicate.to_string())
+    document.add_paragraph("Si quiero filtra los salarios superiores a 50,000 se hace de la siguiente manera: duplicate.loc[duplicate['Salario' ]> 50000]")
     
+    document.add_paragraph(duplicate.loc[duplicate['Salario' ]> 50000].to_string())
 
+    document.add_paragraph("Para agregar una columna nueva a un dataframe se hace de esta manera:duplicate['Posición'] agregando los valores que tendra la columna: ")
+    duplicate['Posición'] = pd.cut(duplicate["Salario"],bins=[40000,60000,65000,75000],labels=['junior','mid','Senior'])
+    document.add_paragraph(duplicate.to_string())
 
+    document.add_paragraph("Esta nueva columna se calcula cuanto se le descuenta de afp + ars: ")
+    duplicate['AFP + ARS'] = duplicate["Salario"] * (5.91 /100)
+    duplicate['Salario_Neto'] = duplicate['Salario'] * 0.9409
+    document.add_paragraph(duplicate.to_string())
 
 
    
