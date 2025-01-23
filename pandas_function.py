@@ -157,8 +157,39 @@ def pandas_manipulation(source,document):
     duplicate['Salario_Neto'] = duplicate['Salario'] * 0.9409
     document.add_paragraph(duplicate.to_string())
 
+    #Concatenacion
 
-   
+    document.add_heading("Concatenacion y combinacion", level=2)
+    
+    data_lima = {
+    'Producto': ['A', 'B'],
+    'Ventas': [250, 150],
+    'Ciudad': ['Lima', 'Lima']
+    }
+
+    df_lima = pd.DataFrame(data_lima)
+    
+    
+    data_bogota = {
+    'Producto': ['A', 'C'],
+    'Ventas': [100, 200],
+    'Ciudad': ['Bogotá', 'Bogotá']
+}
+    df_bogota = pd.DataFrame(data_bogota)
+    document.add_paragraph("Para concatenar dos o mas dataframes se utiliza el metodo concat de esta manera: pd.concat([df_lima, df_bogota]), este es el resultado: ")
+    df_concat = pd.concat([df_lima, df_bogota])
+    document.add_paragraph(df_concat.to_string())
+    data_inventario = {
+    'Producto': ['A', 'B'],
+    'Inventario': [30, 45]
+    }
+
+    df_inventario = pd.DataFrame(data_inventario)
+    document.add_paragraph("Al concatenar datframes es recomendable reiniciar indices usando la propiedad: reset_index(drop=True)  ")
+    df_concat = pd.concat([df_concat.reset_index(drop=True), df_inventario],axis=1)
+    document.add_paragraph(df_concat.to_string())
+
+    
 
 
     document.save(r"Output/documento de practicas.docx")
