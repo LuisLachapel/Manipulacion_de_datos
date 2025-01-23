@@ -21,6 +21,12 @@ def pandas_manipulation():
     #Concatenacion
     concatenation_handling(document)
     
+    #Formato de largo a ancho e inverso
+    format_lenght_width(document)
+
+    #Separar columnas
+    sepate_columns(document)
+    
 
     document.save(r"Output/documento de practicas.docx")
 
@@ -209,3 +215,50 @@ def concatenation_handling(document):
     document.add_paragraph("Al concatenar datframes es recomendable reiniciar indices usando la propiedad: reset_index(drop=True)  ")
     df_concat = pd.concat([df_concat.reset_index(drop=True), df_inventario],axis=1)
     document.add_paragraph(df_concat.to_string())
+
+def format_lenght_width(document):
+    document.add_heading("Formatear tablas de largo a ancho", level=2)
+    data_largo = {
+    'Producto': ['A', 'A', 'B', 'B', 'C', 'C'],
+    'Mes': ['Enero', 'Febrero', 'Enero', 'Febrero', 'Enero', 'Febrero'],
+    'Ventas': [100, 150, 200, 250, 300, 350]
+    }
+
+    df = pd.DataFrame(data_largo)
+    document.add_paragraph("Para convertir un dataframe de largo a ancho se utiliza el metodo pivot de un dataframe, que te pide tres parametros, index, columns y values")
+    document.add_paragraph("Antes de utilizar el metodo pivot:")
+    document.add_paragraph(df.to_string())
+    document.add_paragraph("Despues de utilizar el metodo pivot:")
+    document.add_paragraph(df.pivot(index='Producto', columns='Mes', values='Ventas').to_string())
+    document.add_heading("Formatear tablas de ancho a largo", level=2)
+    df_width = df.pivot(index='Producto', columns='Mes', values='Ventas')
+    document.add_paragraph("Para formatear dataframes, para pasarlos de ancho a largo se utiliza el metodo melt, el cual te pide un dataframe y que llenes los parametros: id_vars,value_vars,var_name, value_name, el resultado es este:")
+    df_new_lenght = pd.melt(df_width.reset_index(),id_vars=['Producto'],value_vars=['Enero', 'Febrero'],var_name='Mes', value_name='Ventas')
+    document.add_paragraph(df_new_lenght.to_string())
+
+def sepate_columns(document):
+    document.add_heading("Separar columnas", level=2)
+    data = {
+    'Nombre_Completo': ['Juan Perez', 'Maria Gomez', 'Luis Martinez']}
+    data_fechas = {
+    'Fecha': ['01-01-2024', '15-02-2024', '30-03-2024']
+}
+
+    
+    df = pd.DataFrame(data)
+    df_fechas = pd.DataFrame(data_fechas)
+    document.add_paragraph("Para separar los datoscde una tabla de un dataframe en columnas se utiliza el metodo split de la propiedad str: .str.split, donde en el primer parametro se expecifica que elemento se debe separar del texto. ")
+    document.add_paragraph("Antes de separar:")
+    document.add_paragraph(df.to_string())
+    document.add_paragraph(df_fechas.to_string())
+    
+    document.add_paragraph("Despues de separar:")
+    df[['Nombre', 'Apellido']] = df['Nombre_Completo'].str.split(' ', expand=True)
+    df_fechas[['dia','mes','año']] = df_fechas['Fecha'].str.split('-', expand=True)
+    
+    document.add_paragraph(df.to_string())
+    document.add_paragraph(df_fechas.to_string())
+    document.add_paragraph("Para crear una fecha completa con las / se usa el metodo agg, y el metodo join de esta manera: .agg('/'.join,axis=1) ")
+    df_fechas['Fecha_completa'] = df_fechas[['dia','mes','año']].agg('/'.join,axis=1)
+    document.add_paragraph("Resultado:")
+    document.add_paragraph(df_fechas.to_string())  
