@@ -1,8 +1,32 @@
 import pandas as pd
 from docx import Document
 
-def pandas_manipulation(source,document):    
+def pandas_manipulation():    
     document = Document()
+    #Abrir archivos con pandas
+    open_files_with_pd(document)
+    
+    #Descripcion preeliminar
+    data_description(document)
+    
+    #Datos faltantes
+    data_missing(document)
+    
+    #Reestructurar datos
+    restructure_data(document)
+    
+    #Manejo de duplicados y Manejo de columnas 
+    duplicate_and_columns_handling(document)
+
+    #Concatenacion
+    concatenation_handling(document)
+    
+
+    document.save(r"Output/documento de practicas.docx")
+
+
+def open_files_with_pd(document):
+    source = r'D:\Cursos\Python\Manipulacion y limpieza\Resources\notebooks\datos.csv'
     
     document.add_heading(r"Abrir archivos con pandas", level=2)
     data = pd.read_csv(source)
@@ -18,27 +42,27 @@ def pandas_manipulation(source,document):
     document.add_paragraph(file_txt1.to_string())
     document.add_paragraph("Dependiendo el caso agregar el parametro: engine='python'")
 
-    #Descripcion de datos
+def data_description(document):
+     
+     document.add_heading("Descripcion preliminar de los datos", level=2)
 
-    document.add_heading("Descripcion preliminar de los datos", level=2)
+     data_txt = pd.read_csv(r'Resources\notebooks\datos.txt', delimiter='|')
 
-    data_txt = pd.read_csv(r'Resources\notebooks\datos.txt', delimiter='|')
+     document.add_paragraph('Para tener una descripcion de los datos utlizar el metodo describe de pandas ')
+     document.add_paragraph(data_txt.describe().to_string())
 
-    document.add_paragraph('Para tener una descripcion de los datos utlizar el metodo describe de pandas ')
-    document.add_paragraph(data_txt.describe().to_string())
+     document.add_paragraph('Si quiero saber los tipos utilizo la propiedad dtypes: ')
+     document.add_paragraph(data_txt.dtypes.to_string())
 
-    document.add_paragraph('Si quiero saber los tipos utilizo la propiedad dtypes: ')
-    document.add_paragraph(data_txt.dtypes.to_string())
+     document.add_paragraph(r"""Si quero obtener los valores unicos de una columna utilizo el metodo unique, e
+                specificando la columna, ejemplo: df["nombre"].unique():""")
 
-    document.add_paragraph(r"""Si quero obtener los valores unicos de una columna utilizo el metodo unique, e
-              specificando la columna, ejemplo: df["nombre"].unique():""")
+     document.add_paragraph(str(data_txt['nombre'].unique()))
 
-    document.add_paragraph(str(data_txt['nombre'].unique()))
+     document.add_paragraph("Si quiero contarlos utilizo el metodo value_counts: ")
+     document.add_paragraph(data_txt['nombre'].value_counts().to_string())
 
-    document.add_paragraph("Si quiero contarlos utilizo el metodo value_counts: ")
-    document.add_paragraph(data_txt['nombre'].value_counts().to_string())
-
-    #Datos faltantes
+def data_missing(document):
     document.add_heading("Manejo de datos faltantes", level=2)
     data_faltante = pd.read_csv(r'Resources/notebooks/datos_con_faltantes.csv')
 
@@ -83,9 +107,10 @@ def pandas_manipulation(source,document):
                             se utiliza la propiedad subset, ejemplo de subset= [Nombre]:""")
     document.add_paragraph(data_fill.dropna(subset=['Nombre'],inplace= False).to_string())
 
-        #Reestructurar datos
-    document.add_heading("Reestructurar datos", level=2)
+def restructure_data(document):
 
+    document.add_heading("Reestructurar datos", level=2)
+    data_faltante = pd.read_csv(r'Resources/notebooks/datos_con_faltantes.csv')
     document.add_paragraph("Para segmentar y clasificar datos continuos en grupos o intevalos se utiliza pd.cut():")
     data_faltante["Rango_Edad"] = pd.cut(data_faltante["Edad"], bins=[20,25,30,35,40],labels=['20-25','25-30','30-35','35-40'],include_lowest= True)
     document.add_paragraph(data_faltante.to_string())
@@ -95,70 +120,66 @@ def pandas_manipulation(source,document):
     data_agrupada = data_faltante.groupby('Rango_Edad',observed= True)['Salario'].mean()
     document.add_paragraph(data_agrupada.to_string())
 
-    #Manejo de duplicados
+def duplicate_and_columns_handling(document):
+ duplicate = pd.read_csv(r'Resources\notebooks\data_duplicada.csv')
+
+ document.add_heading("Manejo de duplicados", level=2)
+ document.add_paragraph("""Al usar el metodo .duplicated() me indica por medio de booleans que filas son duplicadas, sin necesidad de que estos sean consecutivos""")
+
+ document.add_paragraph(duplicate.duplicated().to_string())
+
+ document.add_paragraph("""Se puede usar el parametro subset para especificar las columnas y saber si contiene duplicados""")
     
-    duplicate = pd.read_csv(r'Resources\notebooks\data_duplicada.csv')
+ document.add_paragraph(duplicate.duplicated(subset='Nombre').to_string())
 
-    document.add_heading("Manejo de duplicados", level=2)
-    document.add_paragraph("""Al usar el metodo .duplicated() me indica por medio de booleans que filas son duplicadas, sin necesidad de que estos sean consecutivos""")
+ document.add_paragraph("""Obteniendo las filas de los duplicados con: duplicate[duplicate.duplicated()""")
 
-    document.add_paragraph(duplicate.duplicated().to_string())
+ duplicated_rows = duplicate[duplicate.duplicated()]
+ document.add_paragraph(duplicated_rows.to_string())
 
-    document.add_paragraph("""Se puede usar el parametro subset para especificar las columnas y saber si contiene duplicados""")
-    
-    document.add_paragraph(duplicate.duplicated(subset='Nombre').to_string())
+ document.add_paragraph("""Para eliminar los duplicados se utiliza el metodo .drop_duplicates()""")
+ duplicate_delete = duplicate.drop_duplicates()
+ document.add_paragraph(duplicate_delete.to_string())
 
-    document.add_paragraph("""Obteniendo las filas de los duplicados con: duplicate[duplicate.duplicated()""")
+ document.add_paragraph("Para crear una columna que indique los valores duplicados se hace de este metodo: duplicate['Es duplicado?'] = duplicate.duplicated() ")
+ duplicate['Es duplicado?'] = duplicate.duplicated()
+ document.add_paragraph(duplicate.to_string())
 
-    duplicated_rows = duplicate[duplicate.duplicated()]
-    document.add_paragraph(duplicated_rows.to_string())
-
-    document.add_paragraph("""Para eliminar los duplicados se utiliza el metodo .drop_duplicates()""")
-    duplicate_delete = duplicate.drop_duplicates()
-    document.add_paragraph(duplicate_delete.to_string())
-
-    document.add_paragraph("Para crear una columna que indique los valores duplicados se hace de este metodo: duplicate['Es duplicado?'] = duplicate.duplicated() ")
-    duplicate['Es duplicado?'] = duplicate.duplicated()
-    document.add_paragraph(duplicate.to_string())
-
-    document.add_paragraph("Usando .map puedo cambiar los valores de la columna 'Es duplicado' de un booleano a Si 0 No")
-    duplicate["Es duplicado?"] = duplicate["Es duplicado?"].map({True: 'Si', False: 'No'})
-    document.add_paragraph(duplicate.to_string())
-    """ duplicate_summarized = duplicate.groupby('Nombre').agg({
+ document.add_paragraph("Usando .map puedo cambiar los valores de la columna 'Es duplicado' de un booleano a Si 0 No")
+ duplicate["Es duplicado?"] = duplicate["Es duplicado?"].map({True: 'Si', False: 'No'})
+ document.add_paragraph(duplicate.to_string())
+ """ duplicate_summarized = duplicate.groupby('Nombre').agg({
         'Edad': 'first',
         'Salario': 'mean',
         'Fecha_Ingreso': 'first'
     }).reset_index()"""
-
-    #Manejo de columnas
-
-    document.add_paragraph("Para reordenar las columnas de un dataframe se hace de esta forma:duplicate[['ID','Nombre','Edad', 'Salario','Es duplicado?','Fecha_Ingreso']]")
-    document.add_paragraph(duplicate[['ID','Nombre','Edad', 'Salario','Es duplicado?','Fecha_Ingreso']].to_string())
+  #Manejo de columnas
+ document.add_paragraph("Para reordenar las columnas de un dataframe se hace de esta forma:duplicate[['ID','Nombre','Edad', 'Salario','Es duplicado?','Fecha_Ingreso']]")
+ document.add_paragraph(duplicate[['ID','Nombre','Edad', 'Salario','Es duplicado?','Fecha_Ingreso']].to_string())
     
-    document.add_paragraph("Para elegir columnas especificas de un dataframe se puede usa la propiedad .loc de esta manera: duplicate.loc[:,['ID','Nombre']] ")
-    duplicate_loc = duplicate.loc[:,["ID",'Nombre']]
-    document.add_paragraph(duplicate_loc.to_string())
-    document.add_paragraph("El primer parametro de la propiedad .loc se utiliza para especificar el rango de las filas que se selecionaran, ejemplo de filas del 1 al 9 / 1:9")
-    document.add_paragraph(duplicate_loc[1:9].to_string())
+ document.add_paragraph("Para elegir columnas especificas de un dataframe se puede usa la propiedad .loc de esta manera: duplicate.loc[:,['ID','Nombre']] ")
+ duplicate_loc = duplicate.loc[:,["ID",'Nombre']]
+ document.add_paragraph(duplicate_loc.to_string())
+ document.add_paragraph("El primer parametro de la propiedad .loc se utiliza para especificar el rango de las filas que se selecionaran, ejemplo de filas del 1 al 9 / 1:9")
+ document.add_paragraph(duplicate_loc[1:9].to_string())
 
-    document.add_paragraph("Para eliminar una columna, ejemplo la duplicado, se utiliza el metodo ..drop(columns=['Es duplicado?'])")
-    duplicate = duplicate.drop(columns=['Es duplicado?'])
-    document.add_paragraph(duplicate.to_string())
-    document.add_paragraph("Si quiero filtra los salarios superiores a 50,000 se hace de la siguiente manera: duplicate.loc[duplicate['Salario' ]> 50000]")
+ document.add_paragraph("Para eliminar una columna, ejemplo la duplicado, se utiliza el metodo ..drop(columns=['Es duplicado?'])")
+ duplicate = duplicate.drop(columns=['Es duplicado?'])
+ document.add_paragraph(duplicate.to_string())
+ document.add_paragraph("Si quiero filtra los salarios superiores a 50,000 se hace de la siguiente manera: duplicate.loc[duplicate['Salario' ]> 50000]")
     
-    document.add_paragraph(duplicate.loc[duplicate['Salario' ]> 50000].to_string())
+ document.add_paragraph(duplicate.loc[duplicate['Salario' ]> 50000].to_string())
 
-    document.add_paragraph("Para agregar una columna nueva a un dataframe se hace de esta manera:duplicate['Posición'] agregando los valores que tendra la columna: ")
-    duplicate['Posición'] = pd.cut(duplicate["Salario"],bins=[40000,60000,65000,75000],labels=['junior','mid','Senior'])
-    document.add_paragraph(duplicate.to_string())
+ document.add_paragraph("Para agregar una columna nueva a un dataframe se hace de esta manera:duplicate['Posición'] agregando los valores que tendra la columna: ")
+ duplicate['Posición'] = pd.cut(duplicate["Salario"],bins=[40000,60000,65000,75000],labels=['junior','mid','Senior'])
+ document.add_paragraph(duplicate.to_string())
 
-    document.add_paragraph("Esta nueva columna se calcula cuanto se le descuenta de afp + ars: ")
-    duplicate['AFP + ARS'] = duplicate["Salario"] * (5.91 /100)
-    duplicate['Salario_Neto'] = duplicate['Salario'] * 0.9409
-    document.add_paragraph(duplicate.to_string())
+ document.add_paragraph("Esta nueva columna se calcula cuanto se le descuenta de afp + ars: ")
+ duplicate['AFP + ARS'] = duplicate["Salario"] * (5.91 /100)
+ duplicate['Salario_Neto'] = duplicate['Salario'] * 0.9409
+ document.add_paragraph(duplicate.to_string())
 
-    #Concatenacion
-
+def concatenation_handling(document):
     document.add_heading("Concatenacion y combinacion", level=2)
     
     data_lima = {
@@ -188,11 +209,3 @@ def pandas_manipulation(source,document):
     document.add_paragraph("Al concatenar datframes es recomendable reiniciar indices usando la propiedad: reset_index(drop=True)  ")
     df_concat = pd.concat([df_concat.reset_index(drop=True), df_inventario],axis=1)
     document.add_paragraph(df_concat.to_string())
-
-    
-
-
-    document.save(r"Output/documento de practicas.docx")
-
-
-
