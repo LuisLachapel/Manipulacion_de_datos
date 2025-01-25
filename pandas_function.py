@@ -26,8 +26,14 @@ def pandas_manipulation():
 
     #Separar columnas
     sepate_columns(document)
-    
 
+    #Conversion de datos categoricos
+    categorical_data_conversion(document)
+
+    #Variables dummy
+    dummy_variables(document)
+ 
+   
     document.save(r"Output/documento de practicas.docx")
 
 
@@ -237,6 +243,7 @@ def format_lenght_width(document):
     document.add_paragraph(df_new_lenght.to_string())
 
 def sepate_columns(document):
+
     document.add_heading("Separar columnas", level=2)
     data = {
     'Nombre_Completo': ['Juan Perez', 'Maria Gomez', 'Luis Martinez']}
@@ -262,3 +269,50 @@ def sepate_columns(document):
     df_fechas['Fecha_completa'] = df_fechas[['dia','mes','año']].agg('/'.join,axis=1)
     document.add_paragraph("Resultado:")
     document.add_paragraph(df_fechas.to_string())  
+
+def categorical_data_conversion(document):
+    document.add_heading("Conversion de datos categoricos", level=2)
+    data = {
+    'producto': ['Manzana', 'Banana', 'Cereza', 'Durazno', 'Pera'],
+    'categoria': ['Fruta', 'Fruta', 'Fruta', 'Fruta', 'Fruta'],
+    'calidad': ['Alta', 'Media', 'Baja', 'Alta', 'Media'],  # Columna categórica
+    'ventas': [50, 30, 70, 85, 40]
+}
+
+    document.add_paragraph("Para la conversion de datos categoricos se puede utilizar el metodo de codificacion ordinal que consiste en darle un valor a las variables categoricas para poder darles un orden  lógico o jerárquico  ")
+    df = pd.DataFrame(data)
+    document.add_paragraph("Datatframe si en el orden categorico:")
+    document.add_paragraph(df.to_string())
+    category_map = {'Baja':1, 'Media':2, 'Alta':3}
+    df['Categoria ordinal'] = df['calidad'].map(category_map)
+    document.add_paragraph("Despues:")
+    document.add_paragraph(df.to_string())
+
+    document.add_paragraph("La codificacion one hot permite convertir cada columna categoria a binaria:")
+
+    df_one_hot = pd.get_dummies(df,columns=['calidad'])
+    document.add_paragraph(df_one_hot.to_string())
+
+def dummy_variables(document):
+    document.add_heading("Variables dummy", level=2)
+    data = {
+    'vehiculo': ['Auto', 'Camioneta', 'Moto', 'Camion', 'Auto'],
+    'color': ['Rojo', 'Azul', 'Negro', 'Blanco', 'Rojo'],
+    'precio': [20000, 30000, 15000, 40000, 18000],
+    'ventas': [150, 120, 130, 60, 180]
+     }
+
+    df = pd.DataFrame(data)
+    document.add_paragraph("Las variables dummy son variables categoricas que toman valores binarios, usando el metodo get_dummies se crean columnas binarias con estos valores")
+    document.add_paragraph("Antes de la conversión:")
+    document.add_paragraph(df.to_string())
+    dummy_variables = pd.get_dummies(df,columns=['vehiculo', 'color'])
+    document.add_paragraph("Despues:")
+    document.add_paragraph(dummy_variables.to_string())
+    document.add_paragraph("Usando el parametro drop_first, se elimina la multicolinealidad que consiste en eliminar las columnas que son redundates")
+    dummy_variables_drop = pd.get_dummies(df, columns=['vehiculo','color'],drop_first=True)
+    document.add_paragraph(dummy_variables_drop.to_string())
+    document.add_paragraph("Si quiero que los valores de las columnas dummy se muestren con texto descriptivos, se puede usar el metodo map, pero usando una expresion lambda en vez de booleanos:")
+    rename_dummy_values = dummy_variables_drop[['vehiculo_Camion', 'vehiculo_Camioneta','vehiculo_Moto','color_Blanco', 'color_Negro','color_Rojo']].map(lambda x: 'Si' if x else 'No')
+    document.add_paragraph(rename_dummy_values.to_string())
+
