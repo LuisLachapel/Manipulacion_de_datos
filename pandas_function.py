@@ -32,8 +32,13 @@ def pandas_manipulation():
 
     #Variables dummy
     dummy_variables(document)
- 
-   
+
+    #Funciones de agregación
+    aggregation_function(document)
+
+    #Funciones personalizadas
+    custom_functions(document)
+    
     document.save(r"Output/documento de practicas.docx")
 
 
@@ -315,4 +320,87 @@ def dummy_variables(document):
     document.add_paragraph("Si quiero que los valores de las columnas dummy se muestren con texto descriptivos, se puede usar el metodo map, pero usando una expresion lambda en vez de booleanos:")
     rename_dummy_values = dummy_variables_drop[['vehiculo_Camion', 'vehiculo_Camioneta','vehiculo_Moto','color_Blanco', 'color_Negro','color_Rojo']].map(lambda x: 'Si' if x else 'No')
     document.add_paragraph(rename_dummy_values.to_string())
+
+def aggregation_function(document):
+    document.add_heading("Funciones de agregación",level=2)
+    
+    data = {
+    'producto': ['Manzana', 'Manzana', 'Banana', 'Banana', 'Cereza', 'Cereza', 'Manzana', 'Banana', 'Cereza'],
+    'categoría': ['Fruta', 'Fruta', 'Fruta', 'Legumbre', 'Fruta', 'Fruta', 'Fruta', 'Legumbre', 'Fruta'],
+    'ventas': [50, 30, 20, 15, 10, 25, 45, 55, 40],
+    'precio_unitario': [0.5, 0.5, 0.3, 0.3, 0.8, 0.8, 0.5, 0.3, 0.8],
+    'fecha': pd.date_range(start='2024-01-01', periods=9, freq='D')
+    }
+    document.add_paragraph("Para las funciones de agregacion usando el metodo groupby se debe especificar la columna categorica, los valores los cuales seran agrupados y el calculo que se realizara")
+    df = pd.DataFrame(data)
+    document.add_paragraph("Datos sin agrupar")
+    document.add_paragraph(df.to_string())
+    document.add_paragraph("Datos de suma de ventas agrupados por producto, df.groupby('producto')['ventas'].sum():  ")
+    product_sales = df.groupby('producto')['ventas'].sum()
+    document.add_paragraph(product_sales.to_string())
+    document.add_paragraph("Datos del promedio de precio por unidad agrupados por producto, df.groupby('producto')['precio_unitario'].mean() ")
+    average_product_price = df.groupby('producto')['precio_unitario'].mean()
+    document.add_paragraph(average_product_price.to_string())
+    document.add_paragraph("Con el metodo agg se puede agregar multiples funciones, ejemplo:")
+    sales_summary = df.groupby('producto')['ventas'].agg(['sum','min','max'])
+    document.add_paragraph(sales_summary.to_string())
+    document.add_paragraph("Si quiero cambiar los datos agrupados convertidos en una serie a un dataframe se utiliza el metodo .reset_index() ")
+    sales_summary = df.groupby('producto')['ventas'].agg(['sum','min','max']).reset_index()
+    document.add_paragraph(sales_summary.to_string())
+    document.add_paragraph("Se puede agrupar varias columnas con groupby y crear varias funciones con el metodo agg: ")
+    category_summary = df.groupby(['categoría','producto']).agg(
+        total_sales = ('ventas','sum'),
+        average_price = ('precio_unitario','mean')
+    )
+    document.add_paragraph(category_summary.to_string())
+
+
+def custom_functions(document):
+    document.add_heading("Funciones personalizadas", level=2)
+
+    data = {
+    'producto': ['Manzana', 'Manzana', 'Banana', 'Banana', 'Cereza', 'Cereza', 'Manzana', 'Banana', 'Cereza'],
+    'categoría': ['Fruta', 'Fruta', 'Fruta', 'Fruta', 'Fruta', 'Fruta', 'Fruta', 'Fruta', 'Fruta'],
+    'ventas': [50, 30, 20, 15, 10, 25, 45, 55, 40],
+    'precio_unitario': [0.5, 0.5, 0.3, 0.3, 0.8, 0.8, 0.5, 0.3, 0.8],
+    'fecha': pd.date_range(start='2024-01-01', periods=9, freq='D')
+}
+
+    df = pd.DataFrame(data)
+
+    document.add_paragraph("Usan el metodo apply, se puede integrar funciones personalizadas")
+    document.add_paragraph("Dataframe original:")
+    document.add_paragraph(df.to_string())
+
+
+    def total_renevue(row):
+        return row['ventas'] * row['precio_unitario']
+    
+    df['Ingresos totales'] = df.apply(total_renevue,axis=1)
+    document.add_paragraph("dataframe con los ingresos totales:")
+    document.add_paragraph(df.to_string())
+
+    def classification_sales(ventas):
+        classification = {
+            'Alto': ventas > 40,
+            'Medio': 20 <= ventas <= 40,
+            'Bajo': ventas < 20
+        }
+        for categoria, cantidad in classification.items():
+            if cantidad:
+                return categoria
+
+    document.add_paragraph("dataframe con la clasificacion de las ventas:")
+    df['clasificaciones'] = df['ventas'].apply(classification_sales)
+    document.add_paragraph(df.to_string())
+    
+    def percentage_sales(ventas):
+        total = ventas.sum()
+        porcentaje = (ventas / total) * 100
+        return porcentaje.astype(int)
+    
+    document.add_paragraph("dataframe con el porcentaje de las ventas:")
+    df['Porcentaje'] = df.groupby('producto')['ventas'].transform(percentage_sales)
+    document.add_paragraph(df.to_string())
+
 
