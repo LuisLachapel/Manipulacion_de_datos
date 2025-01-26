@@ -39,6 +39,13 @@ def pandas_manipulation():
     #Funciones personalizadas
     custom_functions(document)
     
+    #Funciones de grupo
+    grouping_functions(document)
+
+
+
+
+
     document.save(r"Output/documento de practicas.docx")
 
 
@@ -402,5 +409,44 @@ def custom_functions(document):
     document.add_paragraph("dataframe con el porcentaje de las ventas:")
     df['Porcentaje'] = df.groupby('producto')['ventas'].transform(percentage_sales)
     document.add_paragraph(df.to_string())
+
+def grouping_functions(document):
+    document.add_heading("Funciones de grupo", level=2)
+    document.add_paragraph("Estas funciones por grupo esta hecho con los metodos groupby y agg")
+
+    data = {
+    'producto': ['Manzana', 'Manzana', 'Banana', 'Banana', 'Cereza', 'Cereza', 'Manzana', 'Banana', 'Cereza'],
+    'categoría': ['Fruta', 'Fruta', 'Fruta', 'Fruta', 'Fruta', 'Fruta', 'Fruta', 'Fruta', 'Fruta'],
+    'ventas': [50, 30, 20, 15, 10, 25, 45, 55, 40],
+    'precio_unitario': [0.5, 0.5, 0.3, 0.3, 0.8, 0.8, 0.5, 0.3, 0.8],
+    'fecha': pd.date_range(start='2024-01-01', periods=9, freq='D')
+}
+
+    df = pd.DataFrame(data)
+
+    document.add_paragraph("Dataframe original:")
+    document.add_paragraph(df.to_string())
+
+    grouping_products_by_sales = df.groupby('producto')['ventas'].agg(['sum','mean']).reset_index()
+    document.add_paragraph("Agrupación de productos por ventas:")
+    document.add_paragraph(grouping_products_by_sales.to_string())
+
+    def range_function(ventas):
+        return ventas.max() - ventas.min()
+
+    range_sales = df.groupby('producto')['ventas'].agg(range_function).reset_index()
+    document.add_paragraph("Rango de ventas, (hecho con una función personalizada):")
+    document.add_paragraph(range_sales.to_string())
+    document.add_paragraph("Agrupación de ingreso total por producto:")
+    df['ingreso_total'] = df['ventas'] * df['precio_unitario']
+    
+    grouping_reneuve = df.groupby(['producto','categoría']).agg({
+        'ventas': 'sum',
+        'ingreso_total': 'sum'
+    }).reset_index()
+
+    document.add_paragraph(grouping_reneuve.to_string())
+
+
 
 
