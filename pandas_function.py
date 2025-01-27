@@ -1,6 +1,8 @@
 import pandas as pd
 from docx import Document
 
+
+
 def pandas_manipulation():    
     document = Document()
     #Abrir archivos con pandas
@@ -42,9 +44,15 @@ def pandas_manipulation():
     #Funciones de grupo
     grouping_functions(document)
 
+    
+    #Exportación de datos
+    export_data(document)
 
+    #Manejo de json
+    handling_json(document)
 
-
+    #Manejo de xml y html
+    handling_xml_html(document)
 
     document.save(r"Output/documento de practicas.docx")
 
@@ -424,6 +432,7 @@ def grouping_functions(document):
 
     df = pd.DataFrame(data)
 
+    
     document.add_paragraph("Dataframe original:")
     document.add_paragraph(df.to_string())
 
@@ -447,6 +456,63 @@ def grouping_functions(document):
 
     document.add_paragraph(grouping_reneuve.to_string())
 
+def export_data(document):
+    document.add_heading("Exportación de datos", level=2)
+    document.add_paragraph("""Para exportar datos se debe primero convertir el conjunto de datos en un dataframe, despues se elige el formato para exportar, de los cuales estan:
+    to_csv
+    to_excel
+    to_parquet
+    to_html
+    etc.
+                           """)
+    document.add_paragraph("Al elegir cualquiera de los formatos para exportar se debe ingresar el nombre que tendra el archivo y su extensión de esta manera: to_excel('Output/documento excel.xlsx',index=True) donde la propiedad index indica si deberia estar numerada cada fila del dataframe. ")
+    document.add_paragraph("""Recomendaciones para el guardado de archivos:
+    En archivos csv, el parametro sep es para separar los delimitadores.
+    float_format='%.2f' Para expecificar que solo haya 2 decimales
+    El parametro compression es para especificar el formato en el que se comprimirá el archivo
+    el parametro compression permite los siguientes procesos compression={'method': 'zip', 'archive_name': 'datos_comprimido.xlsx'}
+    el parametro encoding, permite codificar el archivo a multiples formatos: encoding='utf-8'
+    Con el parametro na_rep puedes especificar con que rellenar los datos nulos o vacios, ej: na_rep='N/A'        """)
 
+def handling_json(document):
+    document.add_heading("Manejo de json", level=2)
+    document.add_paragraph("Para pasar cadenas de json al metodo  pd.read_json, es necesario convertir esas cadenas en un formato StringIO de la siguiente forma: ")
+    document.add_paragraph("""json_data = '''
+[
+    {"producto": "A", "ventas": 100},
+    {"producto": "B", "ventas": 200},
+    {"producto": "C", "ventas": 300}
+]
+'''
+
+# Envolver la cadena JSON en un objeto StringIO
+json_stream = StringIO(json_data)
+
+Es necesario hacer estas importaciones: from io import StringIO """)
+    
+
+    json = pd.read_json(r'Resources\notebooks\datos.json',orient='records')
+    document.add_paragraph("Diferentes orientaciones que se pueden utilizar a exportar en json:")
+    document.add_paragraph("orient='split':")
+    format_split = json.to_json(orient='split')
+    document.add_paragraph(str(format_split))
+    document.add_paragraph("orient='records' uso de la propiedad lines = True (unicamente utilizable con esta orientación):")
+    document.add_paragraph(str(json.to_json(orient='records', lines= True)))
+    document.add_paragraph("orient='index'")
+    document.add_paragraph(str(json.to_json(orient='index')))
+    document.add_paragraph("orient='columns:'")
+    document.add_paragraph(str(json.to_json(orient='columns')))
+    document.add_paragraph("orient='values':")
+    document.add_paragraph(str(json.to_json(orient='values')))
+
+def handling_xml_html(document):
+    document.add_heading("Manejo de xml y html",level=2)
+    document.add_paragraph("Para la lectura de archivos xml se usa el metodo read_xml, si no es un archivo, se usa StringIO de la libreria io al igual que los json  ")
+    df = pd.read_xml(r'Resources\notebooks\datos.xml')
+    document.add_paragraph(df.to_string())
+    
+    tables = pd.read_html(r'Resources\notebooks\datos.html')
+    document.add_paragraph("Si un documento html posee varias tablas usando tables[n] donde n es el numero de tabla que se busca acceder:")
+    document.add_paragraph(tables[0].to_string())
 
 
