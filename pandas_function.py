@@ -1,5 +1,6 @@
 import pandas as pd
 from docx import Document
+import os
 
 
 
@@ -54,6 +55,12 @@ def pandas_manipulation():
     #Manejo de xml y html
     handling_xml_html(document)
 
+    #Uso de sql
+    use_sql(document)
+
+    #uso de orm
+    
+   
     document.save(r"Output/documento de practicas.docx")
 
 
@@ -515,4 +522,68 @@ def handling_xml_html(document):
     document.add_paragraph("Si un documento html posee varias tablas usando tables[n] donde n es el numero de tabla que se busca acceder:")
     document.add_paragraph(tables[0].to_string())
 
+def use_sql(document):
+    document.add_heading("Uso de sql", level=2)
+    from sqlalchemy import create_engine
+    data = {
+    'nombre': ['Juan', 'Ana', 'Luis', 'María', 'Pedro'],
+    'apellido': ['Pérez', 'López', 'González', 'Rodríguez', 'Martínez'],
+    'edad': [30, 28, 40, 35, 45],
+    'salario': [50000, 55000, 70000, 65000, 80000],
+    'departamento': ['Ventas', 'Marketing', 'Finanzas', 'Ventas', 'Recursos Humanos']
+}
 
+    df = pd.DataFrame(data)
+    document.add_paragraph("Para crear un base de datos de sqlite se usa el metodo create_engine de sqlalchemy, el parametro que exige es este: sqlite:///Output/nombre_de_la_basededatos.db, (Las primeras 3 diagonales son obligatorias cuando no hay un nombre de usuario, contraseña o demas parametros)")
+
+   
+    
+
+    engine = create_engine('sqlite:///Output/empleados.db')
+    df.to_sql('empleados',con=engine,if_exists='replace',index=False)
+
+    document.add_paragraph("Con el metodo to_sql de un dataframe puedes hacer que se guarden los datos en una tabla de una base de datos.")
+    document.add_paragraph("""Parametros:
+    name: (obligatorio), Especifica el nombre de la tabla en la base de datos donde se guardará el DataFrame.
+    con: (obligatorio), La conexión a la base de datos, creada previamente con SQLAlchemy (usando create_engine).
+    if_exists: Especifica que hacer si la tabla ya existe.
+    index: Pametro booleano para indicar si se debe guardar el indice en la base de datos""")
+
+    document.add_paragraph("Con el metodo read_sql se puede pasar una query para realizar una operación en db, toma como parametro la conexión 'con'")
+    response = pd.read_sql('select * from empleados', con = engine)
+    
+    #print(response)
+
+def use_orm(document):
+    from empleado import Empleado, session
+    document.add_heading("Uso de orm", level=2)
+    document.add_paragraph("La libreria de sqlalchemy posee multiples clases para mapear clases de python en tablas para una base de datos, entre ellas estan Column, que representaran las columnas de las tablas")
+    document.add_paragraph("""De sqlalchemy.orm estan:
+     declarative_base: Clase base para definir modelos (tablas).
+     sessionmaker: Crea sesiones para interactuar con la base de datos.                      
+                           """)
+    document.add_paragraph("Al instanciar Base = declarative_base() Base se convierte en una clase la cual servira para definir las clases que seran mapeadas en tablas para las base de datos. ")
+    document.add_paragraph("""Con Session se realiza lo siguiente: 
+    Session = sessionmaker(bind=engine)
+    session = Session()
+                        
+    sessionmaker: Genera una fábrica de sesiones ligadas al motor (base de datos).
+    session: Es una instancia de sesión que se usa para interactuar con la base de datos.
+""")
+    document.add_paragraph("Con:  Base.metadata.create_all(engine) Crea las tablas en la base de datos basadas en los modelos definidos (si no existen).")
+    document.add_paragraph("""Con: session.add(empleado) y session.commit() ocurre lo siguiente:
+    session.add(empleado): Añade la instancia al contexto de la sesión.
+    session.commit(): Confirma los cambios y guarda el registro en la base de datos.
+
+        
+""")
+
+    #new_empleo = Empleado(nombre = 'Griselda', apellido='Matos', edad=22, salario=25000, departamento='RH')
+    #session.add(new_empleo)
+    session.commit()
+    """
+    empleados = session.query(Empleado).all()
+    for empleado in empleados :
+        
+        print(empleado)
+    """
