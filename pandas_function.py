@@ -93,6 +93,57 @@ def pandas_manipulation():
     serie_semanal = serie_temporal.resample('W').sum()
     document.add_paragraph(serie_semanal.to_string())
 
+    fechas = ['2024-08-01', '01/08/2024', 'August 1, 2024', '20240801']
+    df = pd.DataFrame({'fecha': fechas})
+    document.add_paragraph("Para el formateo de fechas se usa el metodo  pd.to_datetime función que convierte una columna de tipo texto, enteros u otros formatos a un objeto de fecha y hora (datetime64)., con el parametro format se puede asignar un formato especifico a las fechas.")
+    document.add_paragraph("Fechas del dataframe sin formatear")
+    document.add_paragraph(df.to_string())
+    
+    df['fecha'] = pd.to_datetime(df['fecha'],format='mixed')
+    document.add_paragraph("Fechas convertidas con to_datetime y formateadas con format='mixed' (Formato mixto)")
+    document.add_paragraph(df.to_string())
+    
+
+    document.add_paragraph("con el metodo .dt.strftime('%d-%m-%Y') puedes formatear columnas en formato datetime en columnas string formateadas en una patron especifico")
+    df['fecha_formateada'] = df['fecha'].dt.strftime('%d-%m-%Y')
+    document.add_paragraph("Fecha formateada en '%d-%m-%Y' dia-mes-año: ")
+    document.add_paragraph(df.to_string())
+    print(df)
+
+    document.add_paragraph("El argumento errors='coerce' en el método pd.to_datetime() se utiliza para manejar errores durante la conversión de datos a formato de fecha y hora (datetime). Si pandas encuentra un valor que no puede ser convertido a una fecha válida, en lugar de generar un error, asignará un valor especial llamado NaT ('Not a Time') ")
+    df = df.drop(columns='fecha_formateada')
+    document.add_paragraph("Para la extracción de partes de una fecha (como dia mes o año) se utiliza dt.day|dt.month|dt.year")
+    df['dia'] = df['fecha'].dt.day
+    df['mes'] = df['fecha'].dt.month
+    df['año'] = df['fecha'].dt.year
+    document.add_paragraph(df.to_string())
+    print(df)
+
+    fechas_horas = pd.to_datetime(['2024-08-01 14:30:00', '2023-12-15 09:45:30', '2025-07-20 22:10:15'])
+    df_horas = pd.DataFrame({'fecha_hora': fechas_horas})
+
+    
+    document.add_paragraph("Para la extraccion del tiempo (hora, minuto, segundo) se utiliza dt.hour|dt.minute|dt.second")
+    document.add_paragraph("Fechas con horas:")
+    document.add_paragraph(df_horas.to_string())
+    print(df_horas)
+    df_horas['hora'] = df_horas['fecha_hora'].dt.hour
+    df_horas['minuto'] = df_horas['fecha_hora'].dt.minute
+    df_horas['segundo'] = df_horas['fecha_hora'].dt.second
+    document.add_paragraph(df_horas.to_string())
+
+    df_horas['dia_de_la_semana'] = df_horas['fecha_hora'].dt.weekday
+    df_horas['dia_del_año'] = df_horas['fecha_hora'].dt.day_of_year
+    df_horas['dia_semana_nombre'] = df_horas['fecha_hora'].dt.day_name()
+    df_horas['trimestre'] = df_horas['fecha_hora'].dt.quarter
+
+    #print(df_horas[['fecha_hora','dia_de_la_semana','dia_del_año']])
+    print(df_horas['fecha_hora'].dt.day_of_week)
+
+    document.add_paragraph("El método dt.isocalendar() se utiliza para obtener información relacionada con el calendario ISO para una columna de fechas. El método devuelve un DataFrame con tres columnas: year/week/day:")
+    document.add_paragraph(df_horas['fecha_hora'].dt.isocalendar().to_string())
+    print(df_horas['fecha_hora'].dt.isocalendar().reset_index())
+   
     document.save(r"Output/documento de practicas.docx")
 
 
