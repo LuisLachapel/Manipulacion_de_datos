@@ -59,8 +59,40 @@ def pandas_manipulation():
     use_sql(document)
 
     #uso de orm
+    use_orm(document)
+
+    #Consumo de apis
     
-   
+    #Manejo de tiempo
+    document.add_heading("Manejo de fechas y tiempo",level=2)
+    document.add_paragraph("""El metodo date_range de pandas permite generar una serie de fechas apartir de una fecha inicial, sus parametros son:
+    start: Recibe un valor de fecha o de tipo string que sea una fecha, sirve como fecha inicial.
+                           
+    periods: Es un valor de tipo integer que especifica la cantidad de fechas o puntos de tiempo se deben generar en el rango
+    freq: Especifica la frecuencia de los intervalos entre las fechas generadas. Por defecto es 'D' (diaria).
+""")
+    fechas = pd.date_range(start='2023-01-01', periods=10, freq='D')
+    precios = [150, 152, 149, 153, 155, 158, 157, 160, 162, 161]
+    serie_temporal = pd.Series(data=precios, index=fechas)
+    document.add_paragraph("Una serie es una estructura de datos unidimensional. se pueden crear series con el metodo pd.Series de pandas, posee como parametros data que recibe la información de la serie e index, que pueden contener los idices de los datos.")
+    document.add_paragraph(serie_temporal.to_string())
+    document.add_paragraph("Con la propiedad .iloc[n] se puede obtener el elemento de una serie basado en su posición numerica, si se usa un slicing solo traera los datos de la primera posición especificada hasta la anterior a la ultima espcificada, ej: 1:3 donde se seleccionará los elementos en las posiciones 1 y 2 de la Serie. ")
+    document.add_paragraph(str(serie_temporal.iloc[1]))
+    document.add_paragraph(serie_temporal.iloc[1:3].to_string())
+    document.add_paragraph("Se puede obtener un subconjunto de datos de las series usando slicing ya sea espicificando el indice o la posición.")
+    document.add_paragraph("Por posicion [0:3]")
+    document.add_paragraph(serie_temporal[0:3].to_string())
+    document.add_paragraph("Por indice '2023-01-01':'2023-01-05'")
+    document.add_paragraph(serie_temporal['2023-01-01':'2023-01-05'].to_string())
+    
+    document.add_paragraph("Con el metodo diff puedes obtener la diferencia de valores de los datos con respecto a la fecha anterior.")
+    document.add_paragraph(serie_temporal.diff().to_string())
+    
+    document.add_paragraph("El metodo resample se utiliza para reasignar o agrupar datos de series temporales en diferentes intervalos de tiempo, acepta como parametro el tipo de frecuencia al cual se quiere cambiar ej: (dias,semanas, meses etc)")
+    document.add_paragraph("Suma de series agrupadas en semana: ")
+    serie_semanal = serie_temporal.resample('W').sum()
+    document.add_paragraph(serie_semanal.to_string())
+
     document.save(r"Output/documento de practicas.docx")
 
 
