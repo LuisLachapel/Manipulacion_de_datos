@@ -64,87 +64,12 @@ def pandas_manipulation():
     #Consumo de apis
     
     #Manejo de tiempo
-    document.add_heading("Manejo de fechas y tiempo",level=2)
-    document.add_paragraph("""El metodo date_range de pandas permite generar una serie de fechas apartir de una fecha inicial, sus parametros son:
-    start: Recibe un valor de fecha o de tipo string que sea una fecha, sirve como fecha inicial.
-                           
-    periods: Es un valor de tipo integer que especifica la cantidad de fechas o puntos de tiempo se deben generar en el rango
-    freq: Especifica la frecuencia de los intervalos entre las fechas generadas. Por defecto es 'D' (diaria).
-""")
-    fechas = pd.date_range(start='2023-01-01', periods=10, freq='D')
-    precios = [150, 152, 149, 153, 155, 158, 157, 160, 162, 161]
-    serie_temporal = pd.Series(data=precios, index=fechas)
-    document.add_paragraph("Una serie es una estructura de datos unidimensional. se pueden crear series con el metodo pd.Series de pandas, posee como parametros data que recibe la información de la serie e index, que pueden contener los idices de los datos.")
-    document.add_paragraph(serie_temporal.to_string())
-    document.add_paragraph("Con la propiedad .iloc[n] se puede obtener el elemento de una serie basado en su posición numerica, si se usa un slicing solo traera los datos de la primera posición especificada hasta la anterior a la ultima espcificada, ej: 1:3 donde se seleccionará los elementos en las posiciones 1 y 2 de la Serie. ")
-    document.add_paragraph(str(serie_temporal.iloc[1]))
-    document.add_paragraph(serie_temporal.iloc[1:3].to_string())
-    document.add_paragraph("Se puede obtener un subconjunto de datos de las series usando slicing ya sea espicificando el indice o la posición.")
-    document.add_paragraph("Por posicion [0:3]")
-    document.add_paragraph(serie_temporal[0:3].to_string())
-    document.add_paragraph("Por indice '2023-01-01':'2023-01-05'")
-    document.add_paragraph(serie_temporal['2023-01-01':'2023-01-05'].to_string())
+    handling_time(document)
     
-    document.add_paragraph("Con el metodo diff puedes obtener la diferencia de valores de los datos con respecto a la fecha anterior.")
-    document.add_paragraph(serie_temporal.diff().to_string())
-    
-    document.add_paragraph("El metodo resample se utiliza para reasignar o agrupar datos de series temporales en diferentes intervalos de tiempo, acepta como parametro el tipo de frecuencia al cual se quiere cambiar ej: (dias,semanas, meses etc)")
-    document.add_paragraph("Suma de series agrupadas en semana: ")
-    serie_semanal = serie_temporal.resample('W').sum()
-    document.add_paragraph(serie_semanal.to_string())
-
-    fechas = ['2024-08-01', '01/08/2024', 'August 1, 2024', '20240801']
-    df = pd.DataFrame({'fecha': fechas})
-    document.add_paragraph("Para el formateo de fechas se usa el metodo  pd.to_datetime función que convierte una columna de tipo texto, enteros u otros formatos a un objeto de fecha y hora (datetime64)., con el parametro format se puede asignar un formato especifico a las fechas.")
-    document.add_paragraph("Fechas del dataframe sin formatear")
-    document.add_paragraph(df.to_string())
-    
-    df['fecha'] = pd.to_datetime(df['fecha'],format='mixed')
-    document.add_paragraph("Fechas convertidas con to_datetime y formateadas con format='mixed' (Formato mixto)")
-    document.add_paragraph(df.to_string())
-    
-
-    document.add_paragraph("con el metodo .dt.strftime('%d-%m-%Y') puedes formatear columnas en formato datetime en columnas string formateadas en una patron especifico")
-    df['fecha_formateada'] = df['fecha'].dt.strftime('%d-%m-%Y')
-    document.add_paragraph("Fecha formateada en '%d-%m-%Y' dia-mes-año: ")
-    document.add_paragraph(df.to_string())
-    print(df)
-
-    document.add_paragraph("El argumento errors='coerce' en el método pd.to_datetime() se utiliza para manejar errores durante la conversión de datos a formato de fecha y hora (datetime). Si pandas encuentra un valor que no puede ser convertido a una fecha válida, en lugar de generar un error, asignará un valor especial llamado NaT ('Not a Time') ")
-    df = df.drop(columns='fecha_formateada')
-    document.add_paragraph("Para la extracción de partes de una fecha (como dia mes o año) se utiliza dt.day|dt.month|dt.year")
-    df['dia'] = df['fecha'].dt.day
-    df['mes'] = df['fecha'].dt.month
-    df['año'] = df['fecha'].dt.year
-    document.add_paragraph(df.to_string())
-    print(df)
-
-    fechas_horas = pd.to_datetime(['2024-08-01 14:30:00', '2023-12-15 09:45:30', '2025-07-20 22:10:15'])
-    df_horas = pd.DataFrame({'fecha_hora': fechas_horas})
-
-    
-    document.add_paragraph("Para la extraccion del tiempo (hora, minuto, segundo) se utiliza dt.hour|dt.minute|dt.second")
-    document.add_paragraph("Fechas con horas:")
-    document.add_paragraph(df_horas.to_string())
-    print(df_horas)
-    df_horas['hora'] = df_horas['fecha_hora'].dt.hour
-    df_horas['minuto'] = df_horas['fecha_hora'].dt.minute
-    df_horas['segundo'] = df_horas['fecha_hora'].dt.second
-    document.add_paragraph(df_horas.to_string())
-
-    df_horas['dia_de_la_semana'] = df_horas['fecha_hora'].dt.weekday
-    df_horas['dia_del_año'] = df_horas['fecha_hora'].dt.day_of_year
-    df_horas['dia_semana_nombre'] = df_horas['fecha_hora'].dt.day_name()
-    df_horas['trimestre'] = df_horas['fecha_hora'].dt.quarter
-
-    #print(df_horas[['fecha_hora','dia_de_la_semana','dia_del_año']])
-    print(df_horas['fecha_hora'].dt.day_of_week)
-
-    document.add_paragraph("El método dt.isocalendar() se utiliza para obtener información relacionada con el calendario ISO para una columna de fechas. El método devuelve un DataFrame con tres columnas: year/week/day:")
-    document.add_paragraph(df_horas['fecha_hora'].dt.isocalendar().to_string())
-    print(df_horas['fecha_hora'].dt.isocalendar().reset_index())
-   
+ 
     document.save(r"Output/documento de practicas.docx")
+
+    
 
 
 def open_files_with_pd(document):
@@ -670,3 +595,127 @@ def use_orm(document):
         
         print(empleado)
     """
+
+def handling_time(document):
+    document.add_heading("Manejo de fechas y tiempo",level=2)
+    document.add_paragraph("""El metodo date_range de pandas permite generar una serie de fechas apartir de una fecha inicial, sus parametros son:
+    start: Recibe un valor de fecha o de tipo string que sea una fecha, sirve como fecha inicial.
+                           
+    periods: Es un valor de tipo integer que especifica la cantidad de fechas o puntos de tiempo se deben generar en el rango
+    freq: Especifica la frecuencia de los intervalos entre las fechas generadas. Por defecto es 'D' (diaria).
+""")
+    fechas = pd.date_range(start='2023-01-01', periods=10, freq='D')
+    precios = [150, 152, 149, 153, 155, 158, 157, 160, 162, 161]
+    serie_temporal = pd.Series(data=precios, index=fechas)
+    document.add_paragraph("Una serie es una estructura de datos unidimensional. se pueden crear series con el metodo pd.Series de pandas, posee como parametros data que recibe la información de la serie e index, que pueden contener los idices de los datos.")
+    document.add_paragraph(serie_temporal.to_string())
+    document.add_paragraph("Con la propiedad .iloc[n] se puede obtener el elemento de una serie basado en su posición numerica, si se usa un slicing solo traera los datos de la primera posición especificada hasta la anterior a la ultima espcificada, ej: 1:3 donde se seleccionará los elementos en las posiciones 1 y 2 de la Serie. ")
+    document.add_paragraph(str(serie_temporal.iloc[1]))
+    document.add_paragraph(serie_temporal.iloc[1:3].to_string())
+    document.add_paragraph("Se puede obtener un subconjunto de datos de las series usando slicing ya sea espicificando el indice o la posición.")
+    document.add_paragraph("Por posicion [0:3]")
+    document.add_paragraph(serie_temporal[0:3].to_string())
+    document.add_paragraph("Por indice '2023-01-01':'2023-01-05'")
+    document.add_paragraph(serie_temporal['2023-01-01':'2023-01-05'].to_string())
+    
+    document.add_paragraph("Con el metodo diff puedes obtener la diferencia de valores de los datos con respecto a la fecha anterior.")
+    document.add_paragraph(serie_temporal.diff().to_string())
+    
+    document.add_paragraph("El metodo resample se utiliza para reasignar o agrupar datos de series temporales en diferentes intervalos de tiempo, acepta como parametro el tipo de frecuencia al cual se quiere cambiar ej: (dias,semanas, meses etc)")
+    document.add_paragraph("Suma de series agrupadas en semana: ")
+    serie_semanal = serie_temporal.resample('W').sum()
+    document.add_paragraph(serie_semanal.to_string())
+
+    fechas = ['2024-08-01', '01/08/2024', 'August 1, 2024', '20240801']
+    df = pd.DataFrame({'fecha': fechas})
+    document.add_paragraph("Para el formateo de fechas se usa el metodo  pd.to_datetime función que convierte una columna de tipo texto, enteros u otros formatos a un objeto de fecha y hora (datetime64)., con el parametro format se puede asignar un formato especifico a las fechas.")
+    document.add_paragraph("Fechas del dataframe sin formatear")
+    document.add_paragraph(df.to_string())
+    
+    df['fecha'] = pd.to_datetime(df['fecha'],format='mixed')
+    document.add_paragraph("Fechas convertidas con to_datetime y formateadas con format='mixed' (Formato mixto)")
+    document.add_paragraph(df.to_string())
+    
+
+    document.add_paragraph("con el metodo .dt.strftime('%d-%m-%Y') puedes formatear columnas en formato datetime en columnas string formateadas en una patron especifico")
+    df['fecha_formateada'] = df['fecha'].dt.strftime('%d-%m-%Y')
+    document.add_paragraph("Fecha formateada en '%d-%m-%Y' dia-mes-año: ")
+    document.add_paragraph(df.to_string())
+    
+
+    document.add_paragraph("El argumento errors='coerce' en el método pd.to_datetime() se utiliza para manejar errores durante la conversión de datos a formato de fecha y hora (datetime). Si pandas encuentra un valor que no puede ser convertido a una fecha válida, en lugar de generar un error, asignará un valor especial llamado NaT ('Not a Time') ")
+    df = df.drop(columns='fecha_formateada')
+    document.add_paragraph("Para la extracción de partes de una fecha (como dia mes o año) se utiliza dt.day|dt.month|dt.year")
+    df['dia'] = df['fecha'].dt.day
+    df['mes'] = df['fecha'].dt.month
+    df['año'] = df['fecha'].dt.year
+    document.add_paragraph(df.to_string())
+    
+
+    fechas_horas = pd.to_datetime(['2024-08-01 14:30:00', '2023-12-15 09:45:30', '2025-07-20 22:10:15'])
+    df_horas = pd.DataFrame({'fecha_hora': fechas_horas})
+
+    
+    document.add_paragraph("Para la extraccion del tiempo (hora, minuto, segundo) se utiliza dt.hour|dt.minute|dt.second")
+    document.add_paragraph("Fechas con horas:")
+    document.add_paragraph(df_horas.to_string())
+    
+    df_horas['hora'] = df_horas['fecha_hora'].dt.hour
+    df_horas['minuto'] = df_horas['fecha_hora'].dt.minute
+    df_horas['segundo'] = df_horas['fecha_hora'].dt.second
+    document.add_paragraph(df_horas.to_string())
+
+    df_horas['dia_de_la_semana'] = df_horas['fecha_hora'].dt.weekday
+    df_horas['dia_del_año'] = df_horas['fecha_hora'].dt.day_of_year
+    df_horas['dia_semana_nombre'] = df_horas['fecha_hora'].dt.day_name()
+    df_horas['trimestre'] = df_horas['fecha_hora'].dt.quarter
+
+    #print(df_horas[['fecha_hora','dia_de_la_semana','dia_del_año']])
+    
+
+    document.add_paragraph("El método dt.isocalendar() se utiliza para obtener información relacionada con el calendario ISO para una columna de fechas. El método devuelve un DataFrame con tres columnas: year/week/day:")
+    document.add_paragraph(df_horas['fecha_hora'].dt.isocalendar().to_string())
+   
+
+    document.add_paragraph("Si una columna con valores datetime posee datos faltantes se pueden usar los metodos ffill() y bffill(). ffill rellena la información faltante con la fecha de la fila anterior mientras que bffill con la posterior")
+    document.add_paragraph("Con pd.Timestamp puedes convertir una cadena en un objeto de tipo Timestamp (fecha y hora en pandas). Combinándolo con .fillna() puedes remplazar los valores faltantes con la fecha proporcionada ")
+    
+
+    fechas = ['2024-08-01', None, '2024-99-99', '2023-12-15']
+    df = pd.DataFrame({'fecha': fechas})
+    df['fecha'] = pd.to_datetime(df['fecha'], errors='coerce')
+    document.add_paragraph("Fecha sin limpiar:")
+    document.add_paragraph(df.to_string())
+
+    
+    document.add_paragraph("uso de drona():")
+    df_cleaned = df.dropna(subset=['fecha'])
+    document.add_paragraph(df_cleaned.to_string())
+    document.add_paragraph("Uso de notna() devuelve un booleano que indica  si hay valores vacios o no")
+    document.add_paragraph(df['fecha'].notna().to_string())
+
+    document.add_paragraph("Se puede hacer calculos con las fecha como ejemplo restar:")
+    df = pd.DataFrame({
+    'fecha_inicio': pd.to_datetime(['2024-08-01', '2023-12-15', '2025-07-20']),
+    'fecha_fin': pd.to_datetime(['2024-08-10', '2021-12-25', '2025-08-01'])
+})
+    df['diferencia_dias'] = df['fecha_fin'] - df['fecha_inicio']
+    document.add_paragraph(df.to_string())
+    
+    document.add_paragraph("Con el pd.DateOffset() se puede  sumar o restar períodos de tiempo a fechas en un DataFrame o Series de tipo datetime:")
+    df['fecha_inicio_mas_6d'] = df['fecha_inicio'] + pd.DateOffset(days=6)
+    df['fecha_menos_1_mes'] = df['fecha_fin'] - pd.DateOffset(months=1)
+    df['fecha_mas_2_años'] = df['fecha_inicio'] + pd.DateOffset(years=2)
+    document.add_paragraph(df.to_string())
+
+    fechas = pd.date_range(start='2024-01-01', end='2024-12-31', freq='D')
+    datos = pd.Series(range(len(fechas)), index=fechas)
+
+    document.add_paragraph("Con el metodo resample puedes reagrupar las fecha e integrarle una funcion de agregacion, ejemplo reagrupacion a final de mes resample('M') con promedio de dias ")
+    datos_mensuales = datos.resample('M').mean()
+    document.add_paragraph(datos_mensuales.to_string())
+
+    document.add_paragraph("Para realizar promedios moviles se utiliza el metodo rolling(window=7).mean() donde el parametro window especifica de cuanto sera la ventana deslizante de 7 días sobre la serie de datos.")
+    datos_rolling = datos.rolling(window=7).mean()
+    document.add_paragraph(datos_rolling['2024-01-01':'2024-01-14'].to_string())
+
