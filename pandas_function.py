@@ -1,5 +1,6 @@
 import pandas as pd
 from docx import Document
+from convert_to_table import to_table
 import os
 
 
@@ -78,20 +79,9 @@ def open_files_with_pd(document):
     document.add_heading(r"Abrir archivos con pandas", level=2)
     data = pd.read_csv(source)
     #crear tabla
-    total_columns = len(data.columns)
-    table = document.add_table(rows = 1, cols = total_columns)
-    table.style = "Table Grid"
-    header_cells = table.rows[0].cells
+    to_table(data, document)
 
-    for index, columns in enumerate(data):
-        header_cells[index].text = columns
-
-    for _,row in data.iterrows():
-        row_cells = table.add_row().cells
-        for idx, value in enumerate(row):
-            row_cells[idx].text = str(value)
-
-    document.add_paragraph(data.to_string())
+    
     document.add_paragraph(r"""para saltar tabulaciones agrega el parametro delimiter al pd.read asi:
                pd.read_csv(source, delimiter='\t')""")
     
@@ -100,7 +90,9 @@ def open_files_with_pd(document):
 
     document.add_paragraph("""Para archivos con comentarios con el signo #, 
               se debe saltar las filas con el parametro skiprows = n""")
-    document.add_paragraph(file_txt1.to_string())
+    
+    to_table(file_txt1,document)
+
     document.add_paragraph("Dependiendo el caso agregar el parametro: engine='python'")
 
 def data_description(document):
@@ -111,6 +103,7 @@ def data_description(document):
 
      document.add_paragraph('Para tener una descripcion de los datos utlizar el metodo describe de pandas ')
      document.add_paragraph(data_txt.describe().to_string())
+
 
      document.add_paragraph('Si quiero saber los tipos utilizo la propiedad dtypes: ')
      document.add_paragraph(data_txt.dtypes.to_string())
@@ -135,11 +128,16 @@ def data_missing(document):
 
     data_drop = data_faltante.dropna()
 
+    #Crear tabla
+    to_table(data_drop,document)
+
     data_columns = data_faltante.dropna(axis= 1)
-    document.add_paragraph(data_drop.to_string())
+    
     document.add_paragraph("""Si quiero eliminar las columnas con  datos faltantes se utiliza el parametro axis=1
                en el metodo .dropna()""")
-    document.add_paragraph(data_columns.to_string())
+    
+    to_table(data_columns,document)
+    
 
     document.add_paragraph("""Se puede rellenar los datos faltantes utilizando el metodo fillna()
                y especificar que deseas rellenar""")
@@ -148,25 +146,26 @@ def data_missing(document):
 
     data_faltante['Nombre'] = data_faltante['Nombre'].fillna("Desconocido")
 
-    document.add_paragraph(data_faltante.to_string())
+    to_table(data_faltante,document)
+    
 
     document.add_paragraph("Para rellenar datos numericos como el salario se puede rellenar con la media")
 
     data_faltante["Salario"] = data_faltante["Salario"].fillna(data_faltante["Salario"].mean())
-    document.add_paragraph(data_faltante.to_string())
+    to_table(data_faltante,document)
 
     document.add_paragraph("Para  datos numericos como la edad, es mas util  la mediana:")
     data_faltante["Edad"] = data_faltante["Edad"].fillna(data_faltante["Edad"].median())
-    document.add_paragraph(data_faltante.to_string())
+    to_table(data_faltante,document)
 
     document.add_paragraph("Para rellenar datos como la cuidad, seria util el uso de la moda")
     data_faltante["Ciudad"] = data_faltante["Ciudad"].fillna(data_faltante["Ciudad"].mode()[0])
-    document.add_paragraph(data_faltante.to_string())
+    to_table(data_faltante,document)
 
 
     document.add_paragraph("""Para especificar los datos en donde se deban eliminar las columnas
                             se utiliza la propiedad subset, ejemplo de subset= [Nombre]:""")
-    document.add_paragraph(data_fill.dropna(subset=['Nombre'],inplace= False).to_string())
+    to_table(data_fill.dropna(subset=['Nombre'],inplace= False), document)
 
 def restructure_data(document):
 
