@@ -1,0 +1,12 @@
+Inscripciones:
+['ID_Cliente', 'Nombre_Cliente', 'Ciudad', 'Sede', 'Fecha_Inscripción', 'ID_Medio', 'Pais']
+
+Medio:
+['ID_Medio', 'Medio']
+
+Suscripciones:
+['ID_Cliente', 'Nombre_Cliente', 'Ciudad', 'Sede', 'Fecha_Pago', 'Cod_Plan']
+
+Planes:
+['Cod_Plan', 'Plan', 'Precio']
+
