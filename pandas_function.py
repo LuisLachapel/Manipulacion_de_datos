@@ -77,7 +77,20 @@ def open_files_with_pd(document):
     
     document.add_heading(r"Abrir archivos con pandas", level=2)
     data = pd.read_csv(source)
-    
+    #crear tabla
+    total_columns = len(data.columns)
+    table = document.add_table(rows = 1, cols = total_columns)
+    table.style = "Table Grid"
+    header_cells = table.rows[0].cells
+
+    for index, columns in enumerate(data):
+        header_cells[index].text = columns
+
+    for _,row in data.iterrows():
+        row_cells = table.add_row().cells
+        for idx, value in enumerate(row):
+            row_cells[idx].text = str(value)
+
     document.add_paragraph(data.to_string())
     document.add_paragraph(r"""para saltar tabulaciones agrega el parametro delimiter al pd.read asi:
                pd.read_csv(source, delimiter='\t')""")
