@@ -259,7 +259,7 @@ def concatenation_handling(document):
     df_bogota = pd.DataFrame(data_bogota)
     document.add_paragraph("Para concatenar dos o mas dataframes se utiliza el metodo concat de esta manera: pd.concat([df_lima, df_bogota]), este es el resultado: ")
     df_concat = pd.concat([df_lima, df_bogota])
-    document.add_paragraph(df_concat.to_string())
+    to_table(df_concat, document)
     data_inventario = {
     'Producto': ['A', 'B'],
     'Inventario': [30, 45]
@@ -268,7 +268,7 @@ def concatenation_handling(document):
     df_inventario = pd.DataFrame(data_inventario)
     document.add_paragraph("Al concatenar datframes es recomendable reiniciar indices usando la propiedad: reset_index(drop=True)  ")
     df_concat = pd.concat([df_concat.reset_index(drop=True), df_inventario],axis=1)
-    document.add_paragraph(df_concat.to_string())
+    to_table(df_concat,document)
 
 def format_lenght_width(document):
     document.add_heading("Formatear tablas de largo a ancho", level=2)
@@ -281,14 +281,14 @@ def format_lenght_width(document):
     df = pd.DataFrame(data_largo)
     document.add_paragraph("Para convertir un dataframe de largo a ancho se utiliza el metodo pivot de un dataframe, que te pide tres parametros, index, columns y values")
     document.add_paragraph("Antes de utilizar el metodo pivot:")
-    document.add_paragraph(df.to_string())
+    to_table(df,document)
     document.add_paragraph("Despues de utilizar el metodo pivot:")
     document.add_paragraph(df.pivot(index='Producto', columns='Mes', values='Ventas').to_string())
     document.add_heading("Formatear tablas de ancho a largo", level=2)
     df_width = df.pivot(index='Producto', columns='Mes', values='Ventas')
     document.add_paragraph("Para formatear dataframes, para pasarlos de ancho a largo se utiliza el metodo melt, el cual te pide un dataframe y que llenes los parametros: id_vars,value_vars,var_name, value_name, el resultado es este:")
     df_new_lenght = pd.melt(df_width.reset_index(),id_vars=['Producto'],value_vars=['Enero', 'Febrero'],var_name='Mes', value_name='Ventas')
-    document.add_paragraph(df_new_lenght.to_string())
+    to_table(df_new_lenght,document)
 
 def sepate_columns(document):
 
@@ -304,19 +304,21 @@ def sepate_columns(document):
     df_fechas = pd.DataFrame(data_fechas)
     document.add_paragraph("Para separar los datoscde una tabla de un dataframe en columnas se utiliza el metodo split de la propiedad str: .str.split, donde en el primer parametro se expecifica que elemento se debe separar del texto. ")
     document.add_paragraph("Antes de separar:")
-    document.add_paragraph(df.to_string())
-    document.add_paragraph(df_fechas.to_string())
+    to_table(df,document)
+    document.add_paragraph("\n")
+    to_table(df_fechas,document)
     
     document.add_paragraph("Despues de separar:")
     df[['Nombre', 'Apellido']] = df['Nombre_Completo'].str.split(' ', expand=True)
     df_fechas[['dia','mes','año']] = df_fechas['Fecha'].str.split('-', expand=True)
     
-    document.add_paragraph(df.to_string())
-    document.add_paragraph(df_fechas.to_string())
+    to_table(df,document)
+    document.add_paragraph("\n")
+    to_table(df_fechas,document)
     document.add_paragraph("Para crear una fecha completa con las / se usa el metodo agg, y el metodo join de esta manera: .agg('/'.join,axis=1) ")
     df_fechas['Fecha_completa'] = df_fechas[['dia','mes','año']].agg('/'.join,axis=1)
     document.add_paragraph("Resultado:")
-    document.add_paragraph(df_fechas.to_string())  
+    to_table(df_fechas,document)  
 
 def categorical_data_conversion(document):
     document.add_heading("Conversion de datos categoricos", level=2)
@@ -330,16 +332,16 @@ def categorical_data_conversion(document):
     document.add_paragraph("Para la conversion de datos categoricos se puede utilizar el metodo de codificacion ordinal que consiste en darle un valor a las variables categoricas para poder darles un orden  lógico o jerárquico  ")
     df = pd.DataFrame(data)
     document.add_paragraph("Datatframe si en el orden categorico:")
-    document.add_paragraph(df.to_string())
+    to_table(df,document)
     category_map = {'Baja':1, 'Media':2, 'Alta':3}
     df['Categoria ordinal'] = df['calidad'].map(category_map)
     document.add_paragraph("Despues:")
-    document.add_paragraph(df.to_string())
+    to_table(df,document)
 
     document.add_paragraph("La codificacion one hot permite convertir cada columna categoria a binaria:")
 
     df_one_hot = pd.get_dummies(df,columns=['calidad'])
-    document.add_paragraph(df_one_hot.to_string())
+    to_table(df_one_hot,document)
 
 def dummy_variables(document):
     document.add_heading("Variables dummy", level=2)
