@@ -8,4 +8,8 @@ Resources/notebooks/*ipynb
 
 Resources/notebooks/*mp4
 
+#Inogra los archivos db
+Output/*db
+
 __pycache__
+

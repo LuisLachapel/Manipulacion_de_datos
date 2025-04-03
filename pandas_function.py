@@ -9,6 +9,9 @@ def pandas_manipulation():
     document = Document()
     #Abrir archivos con pandas
     open_files_with_pd(document)
+
+    #Manipulación de excel
+    excel_handling(document)
     
     #Descripcion preeliminar
     data_description(document)
@@ -464,18 +467,18 @@ def grouping_functions(document):
 
     
     document.add_paragraph("Dataframe original:")
-    document.add_paragraph(df.to_string())
+    to_table(df,document)
 
     grouping_products_by_sales = df.groupby('producto')['ventas'].agg(['sum','mean']).reset_index()
     document.add_paragraph("Agrupación de productos por ventas:")
-    document.add_paragraph(grouping_products_by_sales.to_string())
+    to_table(grouping_products_by_sales,document)
 
     def range_function(ventas):
         return ventas.max() - ventas.min()
 
     range_sales = df.groupby('producto')['ventas'].agg(range_function).reset_index()
     document.add_paragraph("Rango de ventas, (hecho con una función personalizada):")
-    document.add_paragraph(range_sales.to_string())
+    to_table(range_sales,document)
     document.add_paragraph("Agrupación de ingreso total por producto:")
     df['ingreso_total'] = df['ventas'] * df['precio_unitario']
     
@@ -484,7 +487,7 @@ def grouping_functions(document):
         'ingreso_total': 'sum'
     }).reset_index()
 
-    document.add_paragraph(grouping_reneuve.to_string())
+    to_table(grouping_reneuve,document)
 
 def export_data(document):
     document.add_heading("Exportación de datos", level=2)
@@ -539,11 +542,11 @@ def handling_xml_html(document):
     document.add_heading("Manejo de xml y html",level=2)
     document.add_paragraph("Para la lectura de archivos xml se usa el metodo read_xml, si no es un archivo, se usa StringIO de la libreria io al igual que los json  ")
     df = pd.read_xml(r'Resources\notebooks\datos.xml')
-    document.add_paragraph(df.to_string())
+    to_table(df,document)
     
     tables = pd.read_html(r'Resources\notebooks\datos.html')
     document.add_paragraph("Si un documento html posee varias tablas usando tables[n] donde n es el numero de tabla que se busca acceder:")
-    document.add_paragraph(tables[0].to_string())
+    to_table(tables[0],document)
 
 def use_sql(document):
     document.add_heading("Uso de sql", level=2)
@@ -645,17 +648,17 @@ def handling_time(document):
     df = pd.DataFrame({'fecha': fechas})
     document.add_paragraph("Para el formateo de fechas se usa el metodo  pd.to_datetime función que convierte una columna de tipo texto, enteros u otros formatos a un objeto de fecha y hora (datetime64)., con el parametro format se puede asignar un formato especifico a las fechas.")
     document.add_paragraph("Fechas del dataframe sin formatear")
-    document.add_paragraph(df.to_string())
+    to_table(df,document)
     
     df['fecha'] = pd.to_datetime(df['fecha'],format='mixed')
     document.add_paragraph("Fechas convertidas con to_datetime y formateadas con format='mixed' (Formato mixto)")
-    document.add_paragraph(df.to_string())
+    to_table(df,document)
     
 
     document.add_paragraph("con el metodo .dt.strftime('%d-%m-%Y') puedes formatear columnas en formato datetime en columnas string formateadas en una patron especifico")
     df['fecha_formateada'] = df['fecha'].dt.strftime('%d-%m-%Y')
     document.add_paragraph("Fecha formateada en '%d-%m-%Y' dia-mes-año: ")
-    document.add_paragraph(df.to_string())
+    to_table(df,document)
     
 
     document.add_paragraph("El argumento errors='coerce' en el método pd.to_datetime() se utiliza para manejar errores durante la conversión de datos a formato de fecha y hora (datetime). Si pandas encuentra un valor que no puede ser convertido a una fecha válida, en lugar de generar un error, asignará un valor especial llamado NaT ('Not a Time') ")
@@ -664,7 +667,7 @@ def handling_time(document):
     df['dia'] = df['fecha'].dt.day
     df['mes'] = df['fecha'].dt.month
     df['año'] = df['fecha'].dt.year
-    document.add_paragraph(df.to_string())
+    to_table(df,document)
     
 
     fechas_horas = pd.to_datetime(['2024-08-01 14:30:00', '2023-12-15 09:45:30', '2025-07-20 22:10:15'])
@@ -673,12 +676,12 @@ def handling_time(document):
     
     document.add_paragraph("Para la extraccion del tiempo (hora, minuto, segundo) se utiliza dt.hour|dt.minute|dt.second")
     document.add_paragraph("Fechas con horas:")
-    document.add_paragraph(df_horas.to_string())
+    to_table(df_horas,document)
     
     df_horas['hora'] = df_horas['fecha_hora'].dt.hour
     df_horas['minuto'] = df_horas['fecha_hora'].dt.minute
     df_horas['segundo'] = df_horas['fecha_hora'].dt.second
-    document.add_paragraph(df_horas.to_string())
+    to_table(df_horas,document)
 
     df_horas['dia_de_la_semana'] = df_horas['fecha_hora'].dt.weekday
     df_horas['dia_del_año'] = df_horas['fecha_hora'].dt.day_of_year
@@ -689,7 +692,7 @@ def handling_time(document):
     
 
     document.add_paragraph("El método dt.isocalendar() se utiliza para obtener información relacionada con el calendario ISO para una columna de fechas. El método devuelve un DataFrame con tres columnas: year/week/day:")
-    document.add_paragraph(df_horas['fecha_hora'].dt.isocalendar().to_string())
+    to_table(df_horas['fecha_hora'].dt.isocalendar(),document)
    
 
     document.add_paragraph("Si una columna con valores datetime posee datos faltantes se pueden usar los metodos ffill() y bffill(). ffill rellena la información faltante con la fecha de la fila anterior mientras que bffill con la posterior")
@@ -700,7 +703,7 @@ def handling_time(document):
     df = pd.DataFrame({'fecha': fechas})
     df['fecha'] = pd.to_datetime(df['fecha'], errors='coerce')
     document.add_paragraph("Fecha sin limpiar:")
-    document.add_paragraph(df.to_string())
+    to_table(df,document)
 
     
     document.add_paragraph("uso de drona():")
@@ -715,13 +718,13 @@ def handling_time(document):
     'fecha_fin': pd.to_datetime(['2024-08-10', '2021-12-25', '2025-08-01'])
 })
     df['diferencia_dias'] = df['fecha_fin'] - df['fecha_inicio']
-    document.add_paragraph(df.to_string())
+    to_table(df,document)
     
     document.add_paragraph("Con el pd.DateOffset() se puede  sumar o restar períodos de tiempo a fechas en un DataFrame o Series de tipo datetime:")
     df['fecha_inicio_mas_6d'] = df['fecha_inicio'] + pd.DateOffset(days=6)
     df['fecha_menos_1_mes'] = df['fecha_fin'] - pd.DateOffset(months=1)
     df['fecha_mas_2_años'] = df['fecha_inicio'] + pd.DateOffset(years=2)
-    document.add_paragraph(df.to_string())
+    to_table(df,document)
 
     fechas = pd.date_range(start='2024-01-01', end='2024-12-31', freq='D')
     datos = pd.Series(range(len(fechas)), index=fechas)
@@ -733,4 +736,33 @@ def handling_time(document):
     document.add_paragraph("Para realizar promedios moviles se utiliza el metodo rolling(window=7).mean() donde el parametro window especifica de cuanto sera la ventana deslizante de 7 días sobre la serie de datos.")
     datos_rolling = datos.rolling(window=7).mean()
     document.add_paragraph(datos_rolling['2024-01-01':'2024-01-14'].to_string())
+
+def excel_handling(document):
+ source_excel = r'Resources\notebooks\datos_ejemplo.xlsx'
+
+ document.add_heading("Manipular archivos excel", level=2)
+ document.add_paragraph("para manipular archivos excel importar openpyxl")
+ document.add_paragraph("Si quieres acceder a todas las hojas de un documento excel, se puede hacer utilizando pd.ExcelFile")
+
+
+ xls = pd.ExcelFile(source_excel)
+
+ document.add_paragraph(' '.join(xls.sheet_names))
+
+ document.add_paragraph("si quieres imprimir todo el contenido de cada hoja se utiliza un bucle")
+
+
+ document.add_paragraph("Este es el resultado:")
+
+ for sheet_name in xls.sheet_names:
+    data_excel = pd.read_excel(source_excel,sheet_name= sheet_name)
+    document.add_paragraph(f'Contenido de la hoja: {sheet_name}:')
+    to_table(data_excel,document)
+    document.add_paragraph("\n")
+
+ document.add_paragraph("Para leer un grupo de columnas en especifico se utiliza la propiedad usecols, donde se especifica de que columna a que columna, ej: usecols='A:B'")
+
+ #df_excel = pd.read_excel(source_excel)
+ document.add_paragraph("Para guardar un dataframe en un excel se convierte los datos en un dataframe y se utiliza la propiedad .to_excel, donde la propiendad index se deja en false si no se quiere agregar los numeros a las filas")
+
 
