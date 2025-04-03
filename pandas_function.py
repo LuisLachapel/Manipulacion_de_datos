@@ -355,16 +355,16 @@ def dummy_variables(document):
     df = pd.DataFrame(data)
     document.add_paragraph("Las variables dummy son variables categoricas que toman valores binarios, usando el metodo get_dummies se crean columnas binarias con estos valores")
     document.add_paragraph("Antes de la conversión:")
-    document.add_paragraph(df.to_string())
+    to_table(df,document)
     dummy_variables = pd.get_dummies(df,columns=['vehiculo', 'color'])
     document.add_paragraph("Despues:")
-    document.add_paragraph(dummy_variables.to_string())
+    to_table(dummy_variables,document)
     document.add_paragraph("Usando el parametro drop_first, se elimina la multicolinealidad que consiste en eliminar las columnas que son redundates")
     dummy_variables_drop = pd.get_dummies(df, columns=['vehiculo','color'],drop_first=True)
-    document.add_paragraph(dummy_variables_drop.to_string())
+    to_table(dummy_variables_drop,document)
     document.add_paragraph("Si quiero que los valores de las columnas dummy se muestren con texto descriptivos, se puede usar el metodo map, pero usando una expresion lambda en vez de booleanos:")
     rename_dummy_values = dummy_variables_drop[['vehiculo_Camion', 'vehiculo_Camioneta','vehiculo_Moto','color_Blanco', 'color_Negro','color_Rojo']].map(lambda x: 'Si' if x else 'No')
-    document.add_paragraph(rename_dummy_values.to_string())
+    to_table(rename_dummy_values,document)
 
 def aggregation_function(document):
     document.add_heading("Funciones de agregación",level=2)
@@ -379,7 +379,7 @@ def aggregation_function(document):
     document.add_paragraph("Para las funciones de agregacion usando el metodo groupby se debe especificar la columna categorica, los valores los cuales seran agrupados y el calculo que se realizara")
     df = pd.DataFrame(data)
     document.add_paragraph("Datos sin agrupar")
-    document.add_paragraph(df.to_string())
+    to_table(df,document)
     document.add_paragraph("Datos de suma de ventas agrupados por producto, df.groupby('producto')['ventas'].sum():  ")
     product_sales = df.groupby('producto')['ventas'].sum()
     document.add_paragraph(product_sales.to_string())
@@ -388,16 +388,16 @@ def aggregation_function(document):
     document.add_paragraph(average_product_price.to_string())
     document.add_paragraph("Con el metodo agg se puede agregar multiples funciones, ejemplo:")
     sales_summary = df.groupby('producto')['ventas'].agg(['sum','min','max'])
-    document.add_paragraph(sales_summary.to_string())
+    to_table(sales_summary,document)
     document.add_paragraph("Si quiero cambiar los datos agrupados convertidos en una serie a un dataframe se utiliza el metodo .reset_index() ")
     sales_summary = df.groupby('producto')['ventas'].agg(['sum','min','max']).reset_index()
-    document.add_paragraph(sales_summary.to_string())
+    to_table(sales_summary,document)
     document.add_paragraph("Se puede agrupar varias columnas con groupby y crear varias funciones con el metodo agg: ")
     category_summary = df.groupby(['categoría','producto']).agg(
         total_sales = ('ventas','sum'),
         average_price = ('precio_unitario','mean')
     )
-    document.add_paragraph(category_summary.to_string())
+    to_table(category_summary,document)
 
 
 def custom_functions(document):
@@ -415,7 +415,7 @@ def custom_functions(document):
 
     document.add_paragraph("Usan el metodo apply, se puede integrar funciones personalizadas")
     document.add_paragraph("Dataframe original:")
-    document.add_paragraph(df.to_string())
+    to_table(df,document)
 
 
     def total_renevue(row):
@@ -423,7 +423,7 @@ def custom_functions(document):
     
     df['Ingresos totales'] = df.apply(total_renevue,axis=1)
     document.add_paragraph("dataframe con los ingresos totales:")
-    document.add_paragraph(df.to_string())
+    to_table(df,document)
 
     def classification_sales(ventas):
         classification = {
@@ -437,7 +437,7 @@ def custom_functions(document):
 
     document.add_paragraph("dataframe con la clasificacion de las ventas:")
     df['clasificaciones'] = df['ventas'].apply(classification_sales)
-    document.add_paragraph(df.to_string())
+    to_table(df,document)
     
     def percentage_sales(ventas):
         total = ventas.sum()
@@ -446,7 +446,7 @@ def custom_functions(document):
     
     document.add_paragraph("dataframe con el porcentaje de las ventas:")
     df['Porcentaje'] = df.groupby('producto')['ventas'].transform(percentage_sales)
-    document.add_paragraph(df.to_string())
+    to_table(df,document)
 
 def grouping_functions(document):
     document.add_heading("Funciones de grupo", level=2)
