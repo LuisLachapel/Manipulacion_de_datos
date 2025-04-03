@@ -173,7 +173,7 @@ def restructure_data(document):
     data_faltante = pd.read_csv(r'Resources/notebooks/datos_con_faltantes.csv')
     document.add_paragraph("Para segmentar y clasificar datos continuos en grupos o intevalos se utiliza pd.cut():")
     data_faltante["Rango_Edad"] = pd.cut(data_faltante["Edad"], bins=[20,25,30,35,40],labels=['20-25','25-30','30-35','35-40'],include_lowest= True)
-    document.add_paragraph(data_faltante.to_string())
+    to_table(data_faltante, document)
 
 
     document.add_paragraph("Para obtener el salario promedio por edad utilizo groupby() ")
@@ -195,19 +195,19 @@ def duplicate_and_columns_handling(document):
  document.add_paragraph("""Obteniendo las filas de los duplicados con: duplicate[duplicate.duplicated()""")
 
  duplicated_rows = duplicate[duplicate.duplicated()]
- document.add_paragraph(duplicated_rows.to_string())
+ to_table(duplicated_rows, document)
 
  document.add_paragraph("""Para eliminar los duplicados se utiliza el metodo .drop_duplicates()""")
  duplicate_delete = duplicate.drop_duplicates()
- document.add_paragraph(duplicate_delete.to_string())
+ to_table(duplicate_delete,document)
 
  document.add_paragraph("Para crear una columna que indique los valores duplicados se hace de este metodo: duplicate['Es duplicado?'] = duplicate.duplicated() ")
  duplicate['Es duplicado?'] = duplicate.duplicated()
- document.add_paragraph(duplicate.to_string())
+ to_table(duplicate,document)
 
  document.add_paragraph("Usando .map puedo cambiar los valores de la columna 'Es duplicado' de un booleano a Si 0 No")
  duplicate["Es duplicado?"] = duplicate["Es duplicado?"].map({True: 'Si', False: 'No'})
- document.add_paragraph(duplicate.to_string())
+ to_table(duplicate,document)
  """ duplicate_summarized = duplicate.groupby('Nombre').agg({
         'Edad': 'first',
         'Salario': 'mean',
@@ -215,29 +215,29 @@ def duplicate_and_columns_handling(document):
     }).reset_index()"""
   #Manejo de columnas
  document.add_paragraph("Para reordenar las columnas de un dataframe se hace de esta forma:duplicate[['ID','Nombre','Edad', 'Salario','Es duplicado?','Fecha_Ingreso']]")
- document.add_paragraph(duplicate[['ID','Nombre','Edad', 'Salario','Es duplicado?','Fecha_Ingreso']].to_string())
+ to_table(duplicate[['ID','Nombre','Edad', 'Salario','Es duplicado?','Fecha_Ingreso']],document)
     
  document.add_paragraph("Para elegir columnas especificas de un dataframe se puede usa la propiedad .loc de esta manera: duplicate.loc[:,['ID','Nombre']] ")
  duplicate_loc = duplicate.loc[:,["ID",'Nombre']]
- document.add_paragraph(duplicate_loc.to_string())
+ to_table(duplicate_loc,document)
  document.add_paragraph("El primer parametro de la propiedad .loc se utiliza para especificar el rango de las filas que se selecionaran, ejemplo de filas del 1 al 9 / 1:9")
- document.add_paragraph(duplicate_loc[1:9].to_string())
+ to_table(duplicate_loc[1:9],document)
 
  document.add_paragraph("Para eliminar una columna, ejemplo la duplicado, se utiliza el metodo ..drop(columns=['Es duplicado?'])")
  duplicate = duplicate.drop(columns=['Es duplicado?'])
- document.add_paragraph(duplicate.to_string())
+ to_table(duplicate,document)
  document.add_paragraph("Si quiero filtra los salarios superiores a 50,000 se hace de la siguiente manera: duplicate.loc[duplicate['Salario' ]> 50000]")
     
- document.add_paragraph(duplicate.loc[duplicate['Salario' ]> 50000].to_string())
+ to_table(duplicate.loc[duplicate['Salario' ]> 50000],document)
 
  document.add_paragraph("Para agregar una columna nueva a un dataframe se hace de esta manera:duplicate['Posición'] agregando los valores que tendra la columna: ")
  duplicate['Posición'] = pd.cut(duplicate["Salario"],bins=[40000,60000,65000,75000],labels=['junior','mid','Senior'])
- document.add_paragraph(duplicate.to_string())
+ to_table(duplicate,document)
 
  document.add_paragraph("Esta nueva columna se calcula cuanto se le descuenta de afp + ars: ")
  duplicate['AFP + ARS'] = duplicate["Salario"] * (5.91 /100)
  duplicate['Salario_Neto'] = duplicate['Salario'] * 0.9409
- document.add_paragraph(duplicate.to_string())
+ to_table(duplicate,document)
 
 def concatenation_handling(document):
     document.add_heading("Concatenacion y combinacion", level=2)

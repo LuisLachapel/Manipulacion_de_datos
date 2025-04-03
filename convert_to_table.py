@@ -1,5 +1,3 @@
-from docx import document
-import pandas as pd
 
 def to_table(data, document):
     total_columns = len(data.columns)
